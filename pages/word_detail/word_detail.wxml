@@ -1,0 +1,42 @@
+<view class="word_container">
+  <view class="word_mean_01 blue">{{word.english}}</view>
+  <view class="word_mean">
+    <view class="addword" wx:if="{{addbtn}}" bindtap="addNewWord"><image src="../../img/tianjia.png"></image><text>生词本</text></view>
+    
+    <view class="word_mean_02">
+      <text>{{word.phonetic}}</text><image src="../../img/play.png"></image>
+    </view>
+    <view class="word_mean_03" wx:for="{{chinese}}" wx:for-item="item" wx:for-index="index" wx:key="chinese">{{item.property + item.chinese}}</view>
+  </view>
+  <view class="word_mean_precent" wx:if="{{word.note != '' && word.note != '{}'}}">
+    <text>常用释义词使用率</text>
+    <view>
+      <ec-canvas id="mychart-dom-pie" canvas-id="mychart-pie" ec="{{ ec }}" bind:init="echartInit" data-record="{{note}}"></ec-canvas>
+    </view>
+  </view>
+  <view class="word_mean_example" wx:if="{{word.sentence_english != ''}}">
+    <text class="text01">例句</text>
+    <view class="sentence_english">{{word.sentence_english}}</view>
+    <view class="sentence_chinese">{{word.sentence_chinese}}</view>
+  </view>
+  <view class="btn_area_shadow" hidden="{{study_btn}}"></view>
+  <view class="btn_area" hidden="{{study_btn}}">
+    <view class="btn_area_flex">
+      <view class="btn" style="background: rgba(255,219,92,.8);">太简单</view>
+      <view class="btn" style="background: rgba(49,181,252,.8);" >认识</view>
+      <view class="btn" style="background: rgba(155,242,222,.8);">不认识</view>
+    </view>
+    
+    <view class="progress">
+      <view class="progress_now" style="width :{{progress}}"></view>
+      <text>3/10</text>
+    </view>
+  </view>
+  <view class="btn_area2" hidden="{{new_word_btn}}">
+    <view class="btn_area_flex">
+      <view class="btn" style="background: rgba(255,219,92,.8);" bindtap="handlePrev">上一个</view>
+      <view class="btn" style="background: rgba(49,181,252,.8);" bindtap="handleNext">下一个</view>
+    </view>
+  </view>
+  <view class="word_shadow" hidden="{{word_shadow_show}}" bindtap="SwitchWordShadow" catchtouchmove="noneEnoughPeople">点击查看单词释义</view>
+</view>

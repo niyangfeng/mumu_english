@@ -1,0 +1,27 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <block wx:else>
+      <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+    </block>
+  </view>
+  <view class="number_block">
+    <view>
+      <text class="blue">{{data.punch_total_card}}</text>
+      <text>我的打卡</text>
+    </view>
+    <view>
+      <text class="blue">{{data.has_been_learn_count}}</text>
+      <text>全部已学</text>
+    </view>
+    <view>
+      <text class="blue">{{data.new_words_count}}</text>
+      <text>生词本</text>
+    </view>
+  </view>
+  <view class="invite">
+    分享给好友 <text>></text>
+  </view>
+</view>

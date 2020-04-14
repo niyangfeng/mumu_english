@@ -1,0 +1,15 @@
+<view class="study_plan_container">
+  <view class="study_plan">
+    <picker mode = 'selector' class="book_picker" bindchange="bindBookPickerChange" value="{{book_index}}" range="{{book_list}}" range-key="name" data-idx="{{book_list[book_index].id}}"> 
+      {{status != 0 ? bookname : book_list[book_index].name}}
+      <text class='modify_btn'>修改</text>
+    </picker>
+  </view>
+  <view class="study_plan">
+    <picker mode = 'selector' class="plan_picker" bindchange="bindPlanPickerChange" value="{{plan_index}}" range="{{plan_list}}"> 
+      {{ status == 2 ? planname :(plan_index === 0 ? plan_list[plan_index] : ('每日学习'+plan_list[plan_index]+'个单词，预计'+complete_date+ '学完'))}}
+      <text class='modify_btn'>修改</text>
+    </picker>
+  </view>
+  <view class="save_btn" bindtap="saveBtn">保存修改</view>
+</view>

@@ -1,0 +1,6 @@
+.study_plan_container{width: 100%;height: 100%;background: #fff;}
+.study_plan{width: 100%;height: 100rpx;padding: 0 30rpx;border-bottom:1rpx solid #ccc;background: #f5f5f5;color: #333;line-height: 100rpx;font-size: 26rpx;box-sizing: border-box;}
+.study_plan .modify_btn{width: 100rpx;height: 60rpx;border-radius: 16rpx;line-height: 60rpx;text-align: center;color: #fff;background: #31b5fc;float: right;margin-top: 20rpx;display: inline-block}
+.study_plan .selected_value{width: 300rpx;height: 60rpx;line-height: 60rpx;text-align: center;color: #333;background: #fff;float: left;margin-top: 20rpx;display: inline-block}
+.save_btn{width: 300rpx;height: 80rpx;background: #31b5fc;color: #fff;border-radius: 40rpx;line-height: 80rpx;font-size: 28rpx;text-align: center;position: fixed;bottom: 100rpx;left: calc(50% - 150rpx);}
+.book_picker{width: 100%;height: 100rpx;position: relative}

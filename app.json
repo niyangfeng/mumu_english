@@ -1,0 +1,44 @@
+{
+  "pages": [
+    "pages/personal_center/personal_center",
+    "pages/index/index",
+    "pages/word_detail/word_detail",
+    "pages/search/search",
+    "pages/study_plan/study_plan",
+    "pages/launch/launch",
+    "pages/logs/logs",
+    "pages/card_lists/card_lists"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#37b5fc",
+    "navigationBarTitleText": "木木背单词",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#666",
+    "selectedColor": "#31b5fc",
+    "list": [
+      {
+        "selectedIconPath": "img/index_0.png",
+        "iconPath": "img/index_1.png",
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "selectedIconPath": "img/list_0.png",
+        "iconPath": "img/list_1.png",
+        "pagePath": "pages/card_lists/card_lists",
+        "text": "生词本"
+      },
+      {
+        "selectedIconPath": "img/mine_0.png",
+        "iconPath": "img/mine_1.png",
+        "pagePath": "pages/personal_center/personal_center",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
