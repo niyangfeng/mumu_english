@@ -20,9 +20,18 @@ class request {
           if (res.data.code == 200) {
             resolve(res.data);
           } else {
-            wx.showToast({
-              title: res.data.message,
-            })
+            if (res.data.message === 'TOKEN值为空，请登录'){
+              wx.showToast({
+                icon:'none',
+                title: '请登录',
+              }) 
+            }else{
+              wx.showToast({
+                icon: 'none',
+                title: res.data.message,
+              })
+            }
+            
           }
           resolve(res)
         },

@@ -1,7 +1,7 @@
 <!--index.wxml-->
 <view class="container">
   <view class="userinfo">
-    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 点这里登录 </button>
     <block wx:else>
       <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
       <text class="userinfo-nickname">{{userInfo.nickName}}</text>
@@ -9,19 +9,38 @@
   </view>
   <view class="number_block">
     <view>
-      <text class="blue">{{data.punch_total_card}}</text>
+      <text class="blue">{{data.punch_total_card == undefined ? '--' : data.punch_total_card}}</text>
       <text>我的打卡</text>
     </view>
     <view>
-      <text class="blue">{{data.has_been_learn_count}}</text>
+      <text class="blue">{{data.has_been_learn_count == undefined ? '--' : data.has_been_learn_count}}</text>
       <text>全部已学</text>
     </view>
     <view>
-      <text class="blue">{{data.new_words_count}}</text>
+      <text class="blue">{{data.new_words_count == undefined ? '--' : data.new_words_count}}</text>
       <text>生词本</text>
     </view>
   </view>
   <view class="invite">
-    分享给好友 <text>></text>
+    自动读音 <switch checked="{{autoPlayChecked}}" bindchange="autoPlayChange"/>
   </view>
+  <view class="invite" bindtap="handleShowModal">
+    联系我们 <image src="../../img/right.png"></image>
+  </view>
+  <view class="invite" bindtap="handleReport">
+    反馈问题 <image src="../../img/right.png"></image>
+  </view>
+  <view class="invite" bindtap="handleShowUniqueCode">
+    自定义单词书 <image src="../../img/right.png"></image>
+  </view>
+  <view class="modal_shadow" wx:if="{{modalShow}}" catchtap="handleHideModal">
+    <view class="modal" >
+      <view class="title">联系我们</view>
+      <view>微信：18333156187</view>
+      <view>QQ ：280348093</view>
+      <view>手机：18333156187</view>
+      <view>QQ群：1081062500</view>
+    </view>
+  </view>
+  
 </view>

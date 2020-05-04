@@ -7,7 +7,10 @@
     "pages/study_plan/study_plan",
     "pages/launch/launch",
     "pages/logs/logs",
-    "pages/card_lists/card_lists"
+    "pages/card_lists/card_lists",
+    "pages/h5webview/h5webview",
+    "pages/report/report",
+    "pages/unique_code/unique_code"
   ],
   "window": {
     "backgroundTextStyle": "light",

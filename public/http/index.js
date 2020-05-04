@@ -1,6 +1,6 @@
 
 const app = getApp()
-const api = 'http://dict.mmmba.cn'
+const api = 'https://dict.mmmba.cn'
 import request from './request.js'
 //接口统一管理
 export default {
@@ -113,6 +113,27 @@ export default {
   dailyWord: (data) => {
     return new request({
       url: api + '/api/list/words',
+      data
+    })
+  },
+  //提交已学单词
+  commitWords: (data) => {
+    return new request({
+      url: api + '/api/save/words/record',
+      data
+    })
+  },
+  //上报接口
+  reportQuestion: (data) => {
+    return new request({
+      url: api + '/api/opinion/record',
+      data
+    })
+  },
+  //书籍类别列表
+  bookTypeLisk: (data) => {
+    return new request({
+      url: api + '/api/book/type/list',
       data
     })
   },

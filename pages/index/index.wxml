@@ -4,7 +4,7 @@
     <canvas canvas-id="Canvas"></canvas>
     <!-- <view class="text01 blue">已签到</view> -->
     <view class="text02">
-      <text>1</text>天
+      <text>{{has_been_learned_days}}</text>{{has_been_learned_days == 1 ? 'day' : 'days'}}
     </view>
   </view>
   <view class="study_plan">
@@ -12,8 +12,8 @@
     <text class="modify_plan_btn" bindtap="choosePlan">修改</text>   
   </view>
   <view class="study_plan_num">
-      <text class="blue">{{data.book_name != undefined ? (data.book_name + ' '+data.daily_value + '个/日') : '--/--'}}</text>
-      <text class="blue">{{data.has_been_learned_days != undefined ? (data.has_been_learned_days +'/'+data.total_words_value) : '--'}}</text>
+      <text class="blue">{{data.book_name != undefined ? (data.book_name + ' '+data.daily_value + '/日') : '--/--'}}</text>
+      <text class="blue">{{data.has_been_learned_days != undefined ? (data.has_been_learned_words_count +'/'+data.total_words_value) : '--'}}</text>
   </view>
   <view class="start_btn" bindtap="handleStart">开始学习</view>
 </view>

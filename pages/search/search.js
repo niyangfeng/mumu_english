@@ -41,7 +41,7 @@ Page({
   handleTurnDetail:function(e){
     let id = e.currentTarget.dataset.id;
     wx.navigateTo({
-      url: '../word_detail/word_detail?english_id='+id,
+      url: '../word_detail/word_detail?from=search&english_id='+id,
     })  
   },
   handleCancel:function(){

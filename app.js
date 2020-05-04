@@ -4,7 +4,18 @@ import regeneratorRuntime from './public/regenerator-runtime/runtime.js'
 App({
   onLaunch: function () {
     let that = this;
-    
+    //获取系统信息
+    wx.getSystemInfo({
+      success: function (res) {
+        var model ='';
+        if (res.model.indexOf("X") > -1){
+          model = res.model.substring(0, res.model.indexOf("X")) + "X";
+        }    
+        if (model == 'iPhone X' || model == 'iPhone 11') {
+          that.globalData.isIpx = true  //判断是否为iPhone X 默认为值false，iPhone X 值为true
+        }
+      }
+    })
     // 获取用户信息
     wx.getSetting({
       
@@ -29,19 +40,22 @@ App({
       }
     })
   },
-  wxlogin:function(userinfo){
+  wxlogin:function(userinfo,){
+    let token = '';
     let that = this;
     wx.login({
       success: res => {
-        HTTP.login({
+        let result = HTTP.login({
           js_code:res.code,
           username: wx.getStorageSync('username'),
           wechat_profile: wx.getStorageSync('wechat_profile'),
           openid: wx.getStorageSync('open_id') != ''  ? wx.getStorageSync('open_id') : ''
-        }).then(res=>{
-          wx.setStorageSync('token', res.data.token)
-          wx.setStorageSync('open_id', res.data.openid)
-          this.globalData.userInfo.token = res.data.token
+        })
+        result.then(response=>{
+          token = response.data.token
+          wx.setStorageSync('token', response.data.token)
+          wx.setStorageSync('open_id', response.data.openid)
+          this.globalData.userInfo.token = response.data.token
           wx.showToast({
             title: '登录成功',
           })
@@ -49,10 +63,11 @@ App({
         })
       }
     })
-    return Promise.resolve()
+    return Promise.resolve(token)
   },
   globalData: {
     userInfo: null,
-    token:null
+    token:null,
+    isIpx:false
   }
 })

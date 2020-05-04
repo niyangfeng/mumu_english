@@ -1,0 +1,5 @@
+<view class="container">
+  <view class="text01">请用电脑访问http://h5.mmmba.cn，按照提示自定义您的书籍，如果有任何疑问，请联系QQ280348093</view>
+  <view class="text01 black">唯一标识码（点击可复制）</view>
+  <view class="text01 black" bindtap="copyCode">{{token}}</view>
+</view>

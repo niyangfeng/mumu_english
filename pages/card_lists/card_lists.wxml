@@ -2,7 +2,7 @@
   <view class="card_lists" wx:if="{{word_list.length > 0 }}">
     <view class="card_block" wx:for="{{word_list}}" wx:for-item="item" wx:for-index="index" wx:key="word_list" bindtap="turnToDetail" data-id="{{item.english_id}}">
       <text class="card">{{item.english}}</text>
-      <text class="delete" data-id="{{item.english_id}}" bindtap="removeNewWord">移除</text>
+      <text class="delete" data-id="{{item.english_id}}" catchtap="removeNewWord">移除</text>
     </view>
   </view>
   <view class="empty_block" wx:if="{{word_list.length == 0 }}">您还没有添加单词哦 </view>

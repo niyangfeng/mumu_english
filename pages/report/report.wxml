@@ -1,0 +1,13 @@
+<view class="report-container">
+<form bindsubmit="bindFormSubmit">
+    <input name='title' placeholder="请输入您的标题"></input>
+    <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+    <view class="picker">
+      请选择联系方式：{{array[index]}}
+    </view>
+  </picker>
+    <input name='contact_number' placeholder="请输入您的联系方式"></input>
+    <textarea placeholder="请输入您要反馈的内容" name="content"/>
+    <button form-type="submit"> 提交 </button>
+  </form>
+</view>

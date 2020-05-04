@@ -9,11 +9,21 @@ Page({
     userInfo: {},
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    data:''
+    data:'',
+    autoPlayChecked:false,
+    uniqueCode:'',
+    modalShow:false
   },
   onLoad: function () {
+    if(wx.getStorageSync('autoplay')){
+      this.setData({ autoPlayChecked:true})
+    }
+    if(wx.getStorageSync('token')){
+      this.setData({ uniqueCode: wx.getStorageSync('token') })
+    }
     if (app.globalData.userInfo) {
       app.wxlogin(app.globalData.userInfo).then((res) => {
+        this.getStudyInfo()
         wx.switchTab({
           url: '/pages/index/index',
         })
@@ -27,6 +37,7 @@ Page({
       // 所以此处加入 callback 以防止这种情况
       app.userInfoReadyCallback = res => {
         app.wxlogin(res.userInfo).then((res) => {
+          this.getStudyInfo()
           wx.switchTab({
             url: '/pages/index/index',
           })
@@ -42,6 +53,7 @@ Page({
       wx.getUserInfo({
         success: res => {
           app.wxlogin(res.userInfo).then((res)=>{
+            this.getStudyInfo()
             wx.switchTab({
               url: '/pages/index/index',
             })
@@ -54,24 +66,71 @@ Page({
         }
       })
     }
-    HTTP.userInfo({token:wx.getStorageSync('token')}).then(res=>{
-      if(res.code === 200){
+    
+  },
+  autoPlayChange: function(e){
+    this.setData({ autoPlayChecked:e.detail.value})
+    if (e.detail.value){
+      wx.setStorageSync('autoplay', e.detail.value)
+    }else{
+      wx.removeStorageSync('autoplay')
+    }
+  },
+  getStudyInfo:function(){
+    HTTP.userInfo({ token: wx.getStorageSync('token') }).then(res => {
+      if (res.code === 200) {
         this.setData({
           data: res.data
         })
-      }    
+      }
     })
   },
   getUserInfo: function (e) {
-    app.globalData.userInfo = e.detail.userInfo
-    app.wxlogin(e.detail.userInfo).then((res) => {
-      wx.switchTab({
-        url: '/pages/index/index',
+    if (e.detail.userInfo!=undefined){
+      let that = this;
+      app.globalData.userInfo = e.detail.userInfo;
+      wx.setStorageSync('username', e.detail.userInfo.nickName);
+      wx.setStorageSync('wechat_profile', e.detail.userInfo.avatarUrl);
+      let result = app.wxlogin(e.detail.userInfo)
+      result.then(res => {
+        let timer = setInterval(function () {
+          if (wx.getStorageSync('token') != undefined && wx.getStorageSync('token') != '') {
+            that.setData({uniqueCode: wx.getStorageSync('token')})
+            clearInterval(timer)
+            that.getStudyInfo()
+            wx.switchTab({
+              url: '/pages/index/index',
+            })
+          }
+        }, 200)
+
       })
+      this.setData({
+        userInfo: e.detail.userInfo,
+        hasUserInfo: true
+      })
+    }
+    
+  },
+  handleShowModal:function(){
+    this.setData({modalShow:true})
+  },
+  handleShowUniqueCode:function(){
+    wx.navigateTo({
+      url: '../unique_code/unique_code',
     })
-    this.setData({
-      userInfo: e.detail.userInfo,
-      hasUserInfo: true
+  },
+  handleHideModal:function(){
+    this.setData({modalShow:false})
+  },
+  handleReport: function () {
+    wx.navigateTo({
+      url: '../report/report',
     })
+  },
+  onShow:function(){
+    if (wx.getStorageSync('token') != undefined && wx.getStorageSync('token') != ''){
+      this.getStudyInfo()
+    }
   }
 })

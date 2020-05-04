@@ -9,7 +9,9 @@ Page({
    */
   data: {
     status:0,
-    data:''
+    data:'',
+    has_been_learned_days:0,
+    need_days:0
   },
 
   /**
@@ -17,7 +19,7 @@ Page({
    */
   onLoad (options) {
     let that = this;
-    this.DoCanvas(27.5,100);
+    
     if(wx.getStorageSync('token')==undefined){
       app.wxlogin()
     }
@@ -29,21 +31,21 @@ Page({
     ctx.beginPath()
     ctx.setLineWidth(1)
     ctx.arc(90, 90,85, 0, 2 * Math.PI)
-    ctx.setStrokeStyle('#91F2DE')
+    ctx.setStrokeStyle('#ccc')
     ctx.stroke()
 
     ctx.beginPath()
     ctx.setLineWidth(7)
     ctx.arc(90, 90,85, 1.51 * Math.PI, Math.PI * 1.49 + precentnum / 100 * (Math.PI * 2))
-    // ctx.setStrokeStyle('#5CC696')
-    ctx.setStrokeStyle('#FFDB5C')
+    ctx.setStrokeStyle('#37b5fc')
+    // ctx.setStrokeStyle('#FFDB5C')
     ctx.stroke()
 
     ctx.beginPath()
     ctx.setLineWidth(1)
     ctx.arc(90, 90,85, 1.51 * Math.PI + precentnum / 100 * (Math.PI * 2), Math.PI * 1.49 + tatalnum / 100 * (Math.PI * 2))
-    // ctx.setStrokeStyle('#FF5959')
-    ctx.setStrokeStyle('#91F2DE')
+    ctx.setStrokeStyle('#ccc')
+    // ctx.setStrokeStyle('#91F2DE')
     ctx.stroke()
 
     ctx.draw()
@@ -70,8 +72,9 @@ Page({
       } else {
         english_id = res.data.new_words[0].words.id
       }
+      wx.hideLoading()
       wx.navigateTo({
-        url: '../word_detail/word_detail?from=index&english_id='+english_id,
+        url: '../word_detail/word_detail?from=index&english_id='+english_id+'&rank='+res.data.rank+'&list_number='+res.data.list_number,
       })
     })
     
@@ -93,14 +96,14 @@ Page({
         wx.navigateTo({
           url: '../study_plan/study_plan?status=' + res.data.status,
         })
-      } else if (res.data.status === 2) {
-        // wx.setStorageSync('bookname', res.data.index_data.book_name);
-        // wx.setStorageSync('daily_value', res.data.index_data.daily_value);
-        // wx.setStorageSync('need_days', res.data.index_data.need_days);
+      } else if (res.data.status === 2) {      
         that.setData({
           status: res.data.status,
-          data:res.data.index_data
+          data:res.data.index_data,
+          need_days: res.data.index_data.need_days,
+          has_been_learned_days: res.data.index_data.has_been_learned_days
         })
+        // that.DoCanvas((that.data.has_been_learned_days * 100 / that.data.need_days) < 2 ? 2 : (that.data.has_been_learned_days * 100 / that.data.need_days) , 100);
       }
     })
   },
