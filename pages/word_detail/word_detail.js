@@ -192,18 +192,18 @@ Page({
         word:res.data.words,
         note: note
       })
-      this.checkAudio()
+      // this.checkAudio()
       if (res.data.is_new_words === 0){
         this.setData({addbtn:true})
       }else{
         this.setData({addbtn:false})
       }
-      innerAudioContext.src = 'https://dict.youdao.com/dictvoice?type=2&audio=' + this.data.word.english;
-      if(wx.getStorageSync('autoplay')){
-        if (this.data.have_audio){
-          this.handlePlay();
-        }
-      }
+      // innerAudioContext.src = 'https://dict.youdao.com/dictvoice?type=2&audio=' + this.data.word.english;
+      // if(wx.getStorageSync('autoplay')){
+      //   if (this.data.have_audio){
+      //     this.handlePlay();
+      //   }
+      // }
     })
     return note
   },
@@ -236,6 +236,7 @@ Page({
         this.setData({
           english_id: this.data.new_word_study_list[i+1].english_id
         })
+        this.playAudio(this.data.new_word_study_list[i + 1].english)
         this.loadDetail(this.data.new_word_study_list[i + 1].english_id)
         return 
       }
@@ -257,6 +258,7 @@ Page({
         this.setData({
           english_id: this.data.new_word_study_list[i - 1].english_id
         })
+        this.playAudio(this.data.new_word_study_list[i - 1].english)
         this.loadDetail(this.data.new_word_study_list[i - 1].english_id)
         return
       }
@@ -293,13 +295,15 @@ Page({
         }   
         //切换下一个单词
         if (i < (word_arr.length - 1)) {
-          this.setData({ english_id: word_arr[i].words.id });
+          this.setData({ english_id: word_arr[i].words.id });      
+          this.playAudio(word_arr[i].words.english)  
           this.loadDetail(this.data.english_id);
           this.echartInit();
           this.handleProgress()
           return;
         } else {
           this.setData({ english_id: word_arr[0].words.id });
+          this.playAudio(word_arr[0].words.english)  
           this.loadDetail(this.data.english_id);
           this.echartInit()
           this.handleProgress()
@@ -322,12 +326,14 @@ Page({
           //切换下一个单词
           if (i < (word_arr.length - 1)) {
             this.setData({ english_id: word_arr[i + 1].words.id, word_shadow_show: false });
+            this.playAudio(word_arr[i+1].words.english)  
             this.loadDetail(this.data.english_id);
             this.echartInit()
             this.handleProgress()
             return;
           } else {
             this.setData({ english_id: word_arr[0].words.id, word_shadow_show: false });
+            this.playAudio(word_arr[0].words.english)  
             this.loadDetail(this.data.english_id);
             this.echartInit()
             this.handleProgress()
@@ -390,11 +396,13 @@ Page({
       if (this.data.english_id == this.data.all_words[i].words.id){
         if (i < (this.data.all_words.length-1)){
           this.setData({ english_id: this.data.all_words[i + 1].words.id });
+          this.playAudio(this.data.all_words[i + 1].words.english)  
           this.loadDetail(this.data.english_id);
           this.echartInit()
           return ;
         }else{
           this.setData({ english_id: this.data.all_words[0].words.id });
+          this.playAudio(this.data.all_words[0].words.english)  
           this.loadDetail(this.data.english_id);
           return ;
         }       
@@ -447,9 +455,9 @@ Page({
     }
   },
   //判断音频文件是否存在
-  checkAudio:function(){
+  checkAudio:function(english){
     wx.request({
-      url: 'https://dict.youdao.com/dictvoice?type=2&audio=' + this.data.word.english + '.mp3',
+      url: 'https://dict.youdao.com/dictvoice?type=2&audio=' + english + '.mp3',
       complete:res=>{
         if (res.statusCode === 404){
           this.setData({
@@ -458,7 +466,7 @@ Page({
         }else{
           this.setData({
             have_audio: true,
-            mp3_url: 'http://mp3.mmmba.cn/' + this.data.word.english + '.mp3'
+            mp3_url: 'http://mp3.mmmba.cn/' + english + '.mp3'
           })
         }
       }
@@ -471,6 +479,15 @@ Page({
   //点击 停止
   handleStop: function () {
     innerAudioContext.pause();
+  },
+  playAudio:function(english){
+    this.checkAudio(english);
+    innerAudioContext.src = 'https://dict.youdao.com/dictvoice?type=2&audio=' + english;
+    if (wx.getStorageSync('autoplay')) {
+      if (this.data.have_audio) {
+        this.handlePlay();
+      }
+    }
   },
   /**
    * 生命周期函数--监听页面初次渲染完成
