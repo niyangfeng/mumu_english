@@ -296,15 +296,15 @@ Page({
         //切换下一个单词
         if (i < (word_arr.length - 1)) {
           this.setData({ english_id: word_arr[i].words.id });      
-          this.playAudio(word_arr[i].words.english)  
-          this.loadDetail(this.data.english_id);
+          // this.playAudio(word_arr[i].words.english)  
+          // this.loadDetail(this.data.english_id);
           this.echartInit();
           this.handleProgress()
           return;
         } else {
           this.setData({ english_id: word_arr[0].words.id });
-          this.playAudio(word_arr[0].words.english)  
-          this.loadDetail(this.data.english_id);
+          // this.playAudio(word_arr[0].words.english)  
+          // this.loadDetail(this.data.english_id);
           this.echartInit()
           this.handleProgress()
           return;
@@ -326,15 +326,15 @@ Page({
           //切换下一个单词
           if (i < (word_arr.length - 1)) {
             this.setData({ english_id: word_arr[i + 1].words.id, word_shadow_show: false });
-            this.playAudio(word_arr[i+1].words.english)  
-            this.loadDetail(this.data.english_id);
+            // this.playAudio(word_arr[i+1].words.english)  
+            // this.loadDetail(this.data.english_id);
             this.echartInit()
             this.handleProgress()
             return;
           } else {
             this.setData({ english_id: word_arr[0].words.id, word_shadow_show: false });
-            this.playAudio(word_arr[0].words.english)  
-            this.loadDetail(this.data.english_id);
+            // this.playAudio(word_arr[0].words.english)  
+            // this.loadDetail(this.data.english_id);
             this.echartInit()
             this.handleProgress()
             return;
@@ -367,13 +367,13 @@ Page({
           //切换下一个单词
           if (i < (word_arr.length - 1)) {
             this.setData({ english_id: word_arr[i].words.id });
-            this.loadDetail(this.data.english_id);
+            // this.loadDetail(this.data.english_id);
             this.echartInit()
             this.handleProgress()
             return;
           } else {
             this.setData({ english_id: word_arr[0].words.id });
-            this.loadDetail(this.data.english_id);
+            // this.loadDetail(this.data.english_id);
             this.echartInit()
             this.handleProgress()
             return;
@@ -396,14 +396,15 @@ Page({
       if (this.data.english_id == this.data.all_words[i].words.id){
         if (i < (this.data.all_words.length-1)){
           this.setData({ english_id: this.data.all_words[i + 1].words.id });
-          this.playAudio(this.data.all_words[i + 1].words.english)  
-          this.loadDetail(this.data.english_id);
+          // this.playAudio(this.data.all_words[i + 1].words.english)  
+          // this.loadDetail(this.data.english_id);
           this.echartInit()
           return ;
         }else{
           this.setData({ english_id: this.data.all_words[0].words.id });
-          this.playAudio(this.data.all_words[0].words.english)  
-          this.loadDetail(this.data.english_id);
+          // this.playAudio(this.data.all_words[0].words.english)  
+          // this.loadDetail(this.data.english_id);
+          this.echartInit()
           return ;
         }       
       }

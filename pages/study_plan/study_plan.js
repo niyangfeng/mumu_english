@@ -20,14 +20,16 @@ Page({
     bookname:'请选择单词书',
     planname:'请选择每次学习单词数',
     typename:'请选择书籍类别',
-    type_id:0
+    type_id:0,
+    book_id:'',
   },
   bindBookPickerChange:function(e){
     this.setData({
       book_index: e.detail.value,
       status: 3,
       plan_index:0,
-      bookname: this.data.book_list[e.detail.value].name
+      bookname: this.data.book_list[e.detail.value].name, 
+      book_id: this.data.book_list[e.detail.value].id
     })
     HTTP.chooseBook({ book_id: this.data.book_list[e.detail.value].id,token:wx.getStorageSync('token')})
   },
@@ -44,7 +46,7 @@ Page({
         complete_date: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(),
         status: 3
       })
-      HTTP.choosePlan({ daily_value: that.data.plan_list[e.detail.value], token: wx.getStorageSync('token') })
+      HTTP.choosePlan({ book_id: this.data.book_id,daily_value: that.data.plan_list[e.detail.value], token: wx.getStorageSync('token') })
     }    
   },
   bindBookTypePickerChange:function(e){
