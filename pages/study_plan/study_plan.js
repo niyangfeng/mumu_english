@@ -134,18 +134,17 @@ Page({
             for (let i = 0; i < resp.data.list.length; i++) {
               bookarr.push(resp.data.list[i])
             }
+            if (resp.data.list[i].name === res.data.data.book_name) {
+              that.setData({
+                book_index: i + 1
+              })
+            }
             that.setData({ book_list: bookarr, })
           }
         }
         )
       } else if (res.data.status === 2){
-        for (let i = 0; i < that.data.book_list.length; i++) {
-          if (this.data.book_list[i].name === res.data.data.book_name) {
-            that.setData({
-              book_index: i + 1
-            })
-          }
-        }
+        
         that.setData({
           bookname: res.data.data.book_name,
           daily_value: res.data.data.daily_words,
@@ -160,7 +159,12 @@ Page({
         HTTP.bookList({ token: wx.getStorageSync('token'), book_type: booktypeid }).then((resp) => {
           if (resp.code === 200) {
             for (let i = 0; i < resp.data.list.length; i++) {
-              bookarr.push(resp.data.list[i])
+              bookarr.push(resp.data.list[i]);
+              if (resp.data.list[i].name === res.data.data.book_name) {
+                that.setData({
+                  book_index: i + 1
+                })
+              }
             }
             that.setData({ book_list: bookarr, })
           }
