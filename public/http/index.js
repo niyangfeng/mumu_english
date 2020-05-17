@@ -144,7 +144,7 @@ export default {
       data
     })
   },
-//保存缓存
+//清除缓存
   deleteCache: (data) => {
     return new wx.request({
       url: api + '/api/delete/all/cache',

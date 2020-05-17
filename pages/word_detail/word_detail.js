@@ -282,6 +282,7 @@ Page({
           wx.showToast({
             title: '今日学习已完成',
           })
+          this.deleteCache();
           HTTP.commitWords({ token: wx.getStorageSync('token'), saveAllData: JSON.stringify(this.data.commit_words_list) }).then(res => {
             if (res.code === 200) {
               setTimeout(function () {
@@ -353,6 +354,7 @@ Page({
             wx.showToast({
               title: '今日学习已完成',
             })
+            this.deleteCache();
             HTTP.commitWords({ token: wx.getStorageSync('token'), saveAllData: JSON.stringify(this.data.commit_words_list) }).then(res => {
               if (res.code === 200) {
                 setTimeout(function () {
@@ -481,6 +483,7 @@ Page({
   handleStop: function () {
     innerAudioContext.pause();
   },
+  //播放音乐
   playAudio:function(english){
     this.checkAudio(english);
     innerAudioContext.src = 'https://dict.youdao.com/dictvoice?type=2&audio=' + english;
@@ -489,6 +492,10 @@ Page({
         this.handlePlay();
       }
     }
+  },
+  //清除缓存
+  deleteCache:function(){
+    HTTP.deleteCache({token:wx.getStorageSync('token')});
   },
   /**
    * 生命周期函数--监听页面初次渲染完成
