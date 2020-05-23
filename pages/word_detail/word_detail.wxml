@@ -27,14 +27,19 @@
       <view class="btn" style="background: rgba(49,181,252,.8);" bindtap="handleKnow">认识</view>
       <view class="btn" style="background: rgba(155,242,222,.8);" bindtap="handleUnknow">不认识</view>
     </view>
-    
-    <view class="progress">
-      <view class="progress_now" style="width :{{progress_new}}"></view>
-      <text>{{now_new_word_num+'/' + new_words_list.length+' 新学'}}</text>
-    </view>
-    <view class="progress">
-      <view class="progress_now" style="width :{{progress_revise}}"></view>
-      <text>{{now_revise_word_num+'/' + revise_words_list.length +' 复习'}}</text>
+    <view class="progress_item">
+      <view class="progress_block">
+        <text>{{'新学 ' + now_new_word_num+'/' + new_words_number}}</text>
+        <view class="progress">
+          <view class="progress_now" style="width :{{progress_new}}"></view>
+        </view>
+      </view>
+      <view class="progress_block">
+        <text>{{'复习 ' + now_revise_word_num+'/' + revise_words_number}}</text>
+        <view class="progress">   
+          <view class="progress_now" style="width :{{progress_revise}}"></view>
+        </view>
+      </view>
     </view>
   </view>
   <view class="btn_area2 {{isIpx ? 'btn_area_x' : ''}}" hidden="{{new_word_study_btn}}">

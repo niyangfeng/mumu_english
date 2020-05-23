@@ -139,14 +139,14 @@ export default {
   },
   //保存缓存
   saveCache:(data) => {
-    return new wx.request({
+    return new request({
       url: api + '/api/modify/cache/record',
       data
     })
   },
 //清除缓存
   deleteCache: (data) => {
-    return new wx.request({
+    return new request({
       url: api + '/api/delete/all/cache',
       data
     })

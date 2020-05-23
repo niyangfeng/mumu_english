@@ -67,10 +67,23 @@ Page({
     })
     HTTP.dailyWord({ token: wx.getStorageSync('token') }).then(res => {
       let english_id ; 
-      if (res.data.new_words.length === 0) {
-        english_id = res.data.revise_words[0].words.id
+      let will_study_new_word = [];
+      let will_study_revise_word = [];
+      //从数组中去除已经达标的单词
+      for(let i = 0;i < res.data.new_words.length;i++){
+        if(res.data.new_words[i].is_reach_expected_rank === 0){       
+          will_study_new_word.push(res.data.new_words[i])
+        }
+      }
+      for(let i = 0;i < res.data.revise_words.length;i++){
+        if(res.data.revise_words[i].is_reach_expected_rank === 0){
+          will_study_revise_word.push(res.data.revise_words[i])
+        }
+      }
+      if (will_study_new_word.length === 0) {
+        english_id = will_study_revise_word[0].words.id
       } else {
-        english_id = res.data.new_words[0].words.id
+        english_id = will_study_new_word[0].words.id
       }
       wx.hideLoading()
       wx.navigateTo({

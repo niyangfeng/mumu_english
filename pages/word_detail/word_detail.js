@@ -60,6 +60,12 @@ Page({
     
     let recordData = this.data.note;
     HTTP.wordDetail({ english_id: this.data.english_id , token: wx.getStorageSync('token') }).then((res) => {
+      setTimeout(()=>{
+        this.setData({
+          canClick:true
+        })
+      },200)
+      
       if (res.data.is_new_words === 0) {
         this.setData({ addbtn: true })
       } else {
@@ -99,6 +105,8 @@ Page({
     now_revise_word_num: 0,//当前已学复习词数
     progress_new:'0%',//新学单词进度条
     progress_revise:'0%',//复习单词进度
+    new_words_number:0,//新学单词初始数
+    revise_words_number:0,//复习单词初始数
     study_btn:true,
     new_word_study_btn:true,//生词本上一个/下一个按钮
     word:'',
@@ -115,7 +123,8 @@ Page({
     commit_words_list:[],//提交单词列表
     new_word_study_list:[],//生词本的列表
     have_audio:true,
-    isIpx:false
+    isIpx:false,
+    canClick:true,
   },
 
   /**
@@ -132,20 +141,49 @@ Page({
         list_number:options.list_number
       })
       HTTP.dailyWord({token:wx.getStorageSync('token')}).then(res=>{
+        //保存初始新学/复习单词得初始数量
         this.setData({
-          new_words_list: this.data.new_words_list.concat(res.data.new_words),
-          revise_words_list: this.data.revise_words_list.concat(res.data.revise_words)
+          new_words_number:res.data.new_words.length,
+          revise_words_number:res.data.revise_words.length,
         })
-        if (res.data.new_words.length === 0){
-          let revise_words = res.data.revise_words;
+        //将未达标的存入数组保存
+        let will_study_new_word = [];
+        let will_study_revise_word = [];
+        for(let i = 0;i < res.data.new_words.length;i++){
+          if(res.data.new_words[i].is_reach_expected_rank === 0){       
+            will_study_new_word.push(res.data.new_words[i])
+          }
+        }
+        for(let i = 0;i < res.data.revise_words.length;i++){
+          if(res.data.revise_words[i].is_reach_expected_rank === 0){
+            will_study_revise_word.push(res.data.revise_words[i])
+          }
+        }
+        //将已达标的放入缓存
+        for(let i = 0;i < res.data.new_words.length;i++){
+          if(res.data.new_words[i].is_reach_expected_rank === 1){       
+            this.commitData( 1 , res.data.new_words[i].words.id, res.data.new_words[i].words.english, res.data.new_words[i].rank,this.data.list_number)
+          }
+        }
+        for(let i = 0;i < res.data.revise_words.length;i++){
+          if(res.data.revise_words[i].is_reach_expected_rank === 1){
+            this.commitData(  0, res.data.revise_words[i].words.id, res.data.revise_words[i].words.english, res.data.revise_words[i].rank,this.data.list_number)
+          }
+        }
+        this.setData({
+          new_words_list: this.data.new_words_list.concat(will_study_new_word),
+          revise_words_list: this.data.revise_words_list.concat(will_study_revise_word)
+        })
+        if (will_study_new_word.length === 0){
+          let revise_words = will_study_revise_word;
           for(let i = 0 ; i < revise_words.length; i++){
             revise_words[i].new_word = false
           }
           this.setData({
             all_words: revise_words,
           })
-        } else if (res.data.revise_words.length === 0){
-          let new_words = res.data.new_words;
+        } else if (will_study_revise_word.length === 0){
+          let new_words = will_study_new_word;
           for (let i = 0; i < new_words.length; i++) {
             new_words[i].new_word = true
           }
@@ -153,11 +191,11 @@ Page({
             all_words: new_words
           })
         }else{
-          let new_words = res.data.new_words;
+          let new_words = will_study_new_word;
           for (let i = 0; i < new_words.length; i++) {
             new_words[i].new_word = true
           }
-          let revise_words = res.data.revise_words;
+          let revise_words = will_study_revise_word;
           for (let i = 0; i < revise_words.length; i++) {
             revise_words[i].new_word = false
           }
@@ -165,6 +203,7 @@ Page({
             all_words: new_words.concat(revise_words),
           })
         }
+        this.handleProgress();
       })
     } else if (options.from === 'new_word') {
       HTTP.newWordList({ token: wx.getStorageSync('token') }).then(res => {
@@ -221,132 +260,91 @@ Page({
   },
   //点击下一个
   handleNext:function(){
-    let current_index ;
-    for(let i = 0;i < this.data.new_word_study_list.length;i++){
-      
-      if (this.data.english_id == this.data.new_word_study_list[i].english_id){
-        if (i == (this.data.new_word_study_list.length - 1)) {
-          wx.showToast({
-            icon: 'none',
-            title: '已经是最后一个了',
+    if(!this.data.canClick){
+      wx.showToast({
+        title: '您点击太快了哦',
+        icon:'none'
+      })
+    }else{
+      this.setData({
+        canClick:false
+      })
+      let current_index ;
+      for(let i = 0;i < this.data.new_word_study_list.length;i++){
+        
+        if (this.data.english_id == this.data.new_word_study_list[i].english_id){
+          if (i == (this.data.new_word_study_list.length - 1)) {
+            wx.showToast({
+              icon: 'none',
+              title: '已经是最后一个了',
+            })
+            return
+          }
+          current_index  = i;      
+          this.setData({
+            english_id: this.data.new_word_study_list[i+1].english_id
           })
-          return
+          this.playAudio(this.data.new_word_study_list[i + 1].english)
+          this.loadDetail(this.data.new_word_study_list[i + 1].english_id)
+          return 
         }
-        current_index  = i;      
-        this.setData({
-          english_id: this.data.new_word_study_list[i+1].english_id
-        })
-        this.playAudio(this.data.new_word_study_list[i + 1].english)
-        this.loadDetail(this.data.new_word_study_list[i + 1].english_id)
-        return 
       }
     }
   },
   //点击上一个
   handlePrev: function () {
-    let current_index;
-    for (let i = 0; i < this.data.new_word_study_list.length; i++) {
-      if (this.data.english_id == this.data.new_word_study_list[i].english_id) {
-        if (i == 0) {
-          wx.showToast({
-            icon: 'none',
-            title: '已经是第一个了',
+    if(!this.data.canClick){
+      wx.showToast({
+        title: '您点击太快了哦',
+        icon:'none'
+      })
+    }else{
+      this.setData({
+        canClick:false
+      })
+      let current_index;
+      for (let i = 0; i < this.data.new_word_study_list.length; i++) {
+        if (this.data.english_id == this.data.new_word_study_list[i].english_id) {
+          if (i == 0) {
+            wx.showToast({
+              icon: 'none',
+              title: '已经是第一个了',
+            })
+            return
+          }
+          current_index = i;
+          this.setData({
+            english_id: this.data.new_word_study_list[i - 1].english_id
           })
+          this.playAudio(this.data.new_word_study_list[i - 1].english)
+          this.loadDetail(this.data.new_word_study_list[i - 1].english_id)
           return
         }
-        current_index = i;
-        this.setData({
-          english_id: this.data.new_word_study_list[i - 1].english_id
-        })
-        this.playAudio(this.data.new_word_study_list[i - 1].english)
-        this.loadDetail(this.data.new_word_study_list[i - 1].english_id)
-        return
       }
     }
   },
   //点击太简单
   handleEasy:function(){
-    let word_arr = this.data.all_words
-    for (let i = 0; i < word_arr.length; i++) {
-      if (this.data.english_id == word_arr[i].words.id) {
-        //每个单词点击太简单后当日不出现，进入提交数组
-        this.commitData(word_arr[i].new_word ? 1 : 0, word_arr[i].words.id, word_arr[i].words.english, word_arr[i].rank+Math.ceil(this.data.rank / 2),this.data.list_number)
-        word_arr.splice(i, 1)
-        this.setData({
-          all_words: word_arr,
-          word_shadow_show:false
-        })
-        //判断今日单词是否已学完
-        if (word_arr.length === 0) {
-          this.handleProgress()
-          wx.showToast({
-            title: '今日学习已完成',
-          })
-          this.deleteCache();
-          HTTP.commitWords({ token: wx.getStorageSync('token'), saveAllData: JSON.stringify(this.data.commit_words_list) }).then(res => {
-            if (res.code === 200) {
-              setTimeout(function () {
-                wx.navigateBack({
-                  delta: -1
-                })
-              }, 1000)
-              return;
-            }
-          })      
-        }   
-        //切换下一个单词
-        if (i < (word_arr.length - 1)) {
-          this.setData({ english_id: word_arr[i].words.id });      
-          // this.playAudio(word_arr[i].words.english)  
-          // this.loadDetail(this.data.english_id);
-          this.echartInit();
-          this.handleProgress()
-          return;
-        } else {
-          this.setData({ english_id: word_arr[0].words.id });
-          // this.playAudio(word_arr[0].words.english)  
-          // this.loadDetail(this.data.english_id);
-          this.echartInit()
-          this.handleProgress()
-          return;
-        }  
-        
-      }
-    }
-    
-  },
-  //点击认识
-  handleKnow: function () {
-    let word_arr = this.data.all_words
-    for (let i = 0; i < word_arr.length; i++) {
-      if (this.data.english_id == word_arr[i].words.id) {
-        //点击认识每个单词每日会出现两次
-        if (word_arr[i].doublie_click == undefined){
-          word_arr[i].doublie_click = 1
-          
-          //切换下一个单词
-          if (i < (word_arr.length - 1)) {
-            this.setData({ english_id: word_arr[i + 1].words.id, word_shadow_show: false });
-            // this.playAudio(word_arr[i+1].words.english)  
-            // this.loadDetail(this.data.english_id);
-            this.echartInit()
-            this.handleProgress()
-            return;
-          } else {
-            this.setData({ english_id: word_arr[0].words.id, word_shadow_show: false });
-            // this.playAudio(word_arr[0].words.english)  
-            // this.loadDetail(this.data.english_id);
-            this.echartInit()
-            this.handleProgress()
-            return;
-          }
-          
-        }else{
-          this.commitData(word_arr[i].new_word ? 1 : 0, word_arr[i].words.id, word_arr[i].words.english, word_arr[i].rank + 0.5,this.data.list_number)
+    if(!this.data.canClick){
+      wx.showToast({
+        title: '您点击太快了哦',
+        icon:'none'
+      })
+      return
+    }else{
+      this.setData({
+        canClick:false
+      })
+      let word_arr = this.data.all_words;
+      for (let i = 0; i < word_arr.length; i++) {
+        if (this.data.english_id == word_arr[i].words.id) {
+          //每个单词点击太简单后当日不出现，进入提交数组
+          this.commitData(word_arr[i].is_revise === 0 ? 1 : 0, word_arr[i].words.id, word_arr[i].words.english, word_arr[i].rank+Math.ceil(this.data.rank / 2),this.data.list_number)
+          this.saveCache({token:wx.getStorageSync('token'),english_id:word_arr[i].words.id,word:word_arr[i].words.english,current_rank:word_arr[i].rank+Math.ceil(this.data.rank / 2)})
           word_arr.splice(i, 1)
           this.setData({
             all_words: word_arr,
-            word_shadow_show: false
+            word_shadow_show:false
           })
           //判断今日单词是否已学完
           if (word_arr.length === 0) {
@@ -364,26 +362,97 @@ Page({
                 }, 1000)
                 return;
               }
-            })
-          }  
+            })      
+          }   
           //切换下一个单词
-          if (i < (word_arr.length - 1)) {
-            this.setData({ english_id: word_arr[i].words.id });
-            // this.loadDetail(this.data.english_id);
-            this.echartInit()
+          if (i < (word_arr.length)) {
+            this.setData({ english_id: word_arr[i].words.id });      
+            this.echartInit();
             this.handleProgress()
             return;
-          } else {
-            this.setData({ english_id: word_arr[0].words.id });
-            // this.loadDetail(this.data.english_id);
-            this.echartInit()
-            this.handleProgress()
-            return;
-          }
-        } 
-         
-        
+          } 
+          
+        }
+      }
+    }
+  },
+  //点击认识
+  handleKnow: function () {
+    if(!this.data.canClick){
+      wx.showToast({
+        title: '您点击太快了哦',
+        icon:'none'
+      })
+      return
+    }else{
+      this.setData({
+        canClick:false
+      })
+      let word_arr = this.data.all_words
+      for (let i = 0; i < word_arr.length; i++) {
+        if (this.data.english_id == word_arr[i].words.id) {
+          
+          //点击认识每个单词每日会出现两次
+          if (Math.floor(word_arr[i].rank) === word_arr[i].rank ){
+            this.saveCache({token:wx.getStorageSync('token'),english_id:word_arr[i].words.id,word:word_arr[i].words.english,current_rank:word_arr[i].rank+0.5})
+            word_arr[i].rank = word_arr[i].rank + 0.5;
+            //切换下一个单词
+            if (i < (word_arr.length - 1)) {
+              this.setData({ english_id: word_arr[i + 1].words.id, word_shadow_show: false });
+              // this.playAudio(word_arr[i+1].words.english)  
+              // this.loadDetail(this.data.english_id);
+              this.echartInit()
+              this.handleProgress()
+              return;
+            } else {
+              this.setData({ english_id: word_arr[0].words.id, word_shadow_show: false });
+              // this.playAudio(word_arr[0].words.english)  
+              // this.loadDetail(this.data.english_id);
+              this.echartInit()
+              this.handleProgress()
+              return;
+            }
+            
+          }else{
+            this.saveCache({token:wx.getStorageSync('token'),english_id:word_arr[i].words.id,word:word_arr[i].words.english,current_rank:word_arr[i].rank+0.5})
+            this.commitData(word_arr[i].is_revise === 0 ? 1 : 0, word_arr[i].words.id, word_arr[i].words.english, word_arr[i].rank + 1,this.data.list_number)
+            word_arr[i].rank = word_arr[i].rank + 0.5;
+            word_arr.splice(i, 1)
+            this.setData({
+              all_words: word_arr,
+              word_shadow_show: false
+            })
+            //判断今日单词是否已学完
+            if (word_arr.length === 0) {
+              this.handleProgress()
+              wx.showToast({
+                title: '今日学习已完成',
+              })
+              this.deleteCache();
+              HTTP.commitWords({ token: wx.getStorageSync('token'), saveAllData: JSON.stringify(this.data.commit_words_list) }).then(res => {
+                if (res.code === 200) {
+                  setTimeout(function () {
+                    wx.navigateBack({
+                      delta: -1
+                    })
+                  }, 1000)
+                  return;
+                }
+              })
+            }  
+            //切换下一个单词
+            if (i < (word_arr.length )) {
+              this.setData({ english_id: word_arr[i].words.id });
+              // this.loadDetail(this.data.english_id);
+              this.echartInit()
+              this.handleProgress()
+              return;
+            } 
+          } 
+          
+          
 
+        }
       }
     }
   },
@@ -394,24 +463,33 @@ Page({
   },
   //切换单词
   switchWord:function(){
-    for(let i = 0;i < this.data.all_words.length;i++){
-      if (this.data.english_id == this.data.all_words[i].words.id){
-        if (i < (this.data.all_words.length-1)){
-          this.setData({ english_id: this.data.all_words[i + 1].words.id });
-          // this.playAudio(this.data.all_words[i + 1].words.english)  
-          // this.loadDetail(this.data.english_id);
-          this.echartInit()
-          return ;
-        }else{
-          this.setData({ english_id: this.data.all_words[0].words.id });
-          // this.playAudio(this.data.all_words[0].words.english)  
-          // this.loadDetail(this.data.english_id);
-          this.echartInit()
-          return ;
-        }       
+    if(!this.data.canClick){
+      wx.showToast({
+        title: '您点击太快了哦',
+        icon:'none'
+      })
+    }else{
+      this.setData({
+        canClick:false
+      })
+      for(let i = 0;i < this.data.all_words.length;i++){
+        if (this.data.english_id == this.data.all_words[i].words.id){
+          if (i < (this.data.all_words.length-1)){
+            this.setData({ english_id: this.data.all_words[i + 1].words.id });
+            // this.playAudio(this.data.all_words[i + 1].words.english)  
+            // this.loadDetail(this.data.english_id);
+            this.echartInit()
+            return ;
+          }else{
+            this.setData({ english_id: this.data.all_words[0].words.id });
+            // this.playAudio(this.data.all_words[0].words.english)  
+            // this.loadDetail(this.data.english_id);
+            this.echartInit()
+            return ;
+          }       
+        }
       }
     }
-   
   },
   //存入提交数组
   commitData:function(is_new_words,english_id,word,rank,list_number){
@@ -451,11 +529,12 @@ Page({
           now_revise_word_num: revise_word_num
         })
       }
-      this.setData({
-        progress_new: Math.round(new_word_num / this.data.new_words_list.length * 10000) / 100.00 + "%",
-        progress_revise: Math.round(revise_word_num / this.data.revise_words_list.length * 10000) / 100.00 + "%",
-      })
+      
     }
+    this.setData({
+      progress_new: Math.round(new_word_num / this.data.new_words_number * 10000) / 100.00 + "%",
+      progress_revise: Math.round(revise_word_num / this.data.revise_words_number * 10000) / 100.00 + "%",
+    })
   },
   //判断音频文件是否存在
   checkAudio:function(english){
@@ -492,6 +571,9 @@ Page({
         this.handlePlay();
       }
     }
+  },
+  saveCache:function(data){
+    HTTP.saveCache(data)
   },
   //清除缓存
   deleteCache:function(){
