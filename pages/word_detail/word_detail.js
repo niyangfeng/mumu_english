@@ -59,8 +59,8 @@ Page({
     }
     
     let recordData = this.data.note;
-    HTTP.wordDetail({ english_id: this.data.english_id , token: wx.getStorageSync('token') }).then((res) => {
-      
+    // HTTP.wordDetail({ english_id: this.data.english_id , token: wx.getStorageSync('token') }).then((res) => {
+      let res = this.mockLoadWordDetail(this.data.english_id);
       if (res.data.is_new_words === 0) {
         this.setData({ addbtn: true })
       } else {
@@ -86,7 +86,7 @@ Page({
           this.handlePlay();
         }
       }
-    })   
+    // })   
   },
   /**
    * 页面的初始数据
@@ -198,6 +198,7 @@ Page({
             all_words: new_words.concat(revise_words),
           })
         }
+        // wx.setStorageSync('allwords', this.data.all_words)
         this.handleProgress();
       })
     } else if (options.from === 'new_word') {
@@ -219,7 +220,8 @@ Page({
   //加载单词详情
   loadDetail:function(id){
     let note;
-    HTTP.wordDetail({ english_id: id, token: wx.getStorageSync('token') }).then((res)=>{
+    // HTTP.wordDetail({ english_id: id, token: wx.getStorageSync('token') }).then((res)=>{
+      let res = this.mockLoadWordDetail(this.data.english_id);
       note = JSON.parse(unescape(res.data.words.note))
       this.setData({
         chinese:res.data.chinese,
@@ -238,7 +240,7 @@ Page({
       //     this.handlePlay();
       //   }
       // }
-    })
+    // })
     return note
   },
   //添加生词本
@@ -522,6 +524,17 @@ Page({
   deleteCache:function(){
     HTTP.deleteCache({token:wx.getStorageSync('token')});
   },
+  //从缓存中请求单词详情
+  mockLoadWordDetail:function(english_id){
+    let allwords =  wx.getStorageSync('allwords');
+    for(let i of allwords){
+      if(i.words.id == english_id){
+        return {
+          data:i
+        }
+      }
+    }
+  },
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
@@ -542,6 +555,9 @@ Page({
   onHide: function () {
     wx.removeStorage({
       key: 'commitData',
+    })  
+    wx.removeStorage({
+      key: 'allwords',
     })  
   },
 

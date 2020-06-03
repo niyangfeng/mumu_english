@@ -11,7 +11,8 @@ Page({
     status:0,
     data:'',
     has_been_learned_days:0,
-    need_days:0
+    need_days:0,
+    all_words:[],
   },
 
   /**
@@ -85,6 +86,36 @@ Page({
       } else {
         english_id = will_study_new_word[0].words.id
       }
+      if (will_study_new_word.length === 0){
+        let revise_words = will_study_revise_word;
+        for(let i = 0 ; i < revise_words.length; i++){
+          revise_words[i].new_word = false
+        }
+        this.setData({
+          all_words: revise_words,
+        })
+      } else if (will_study_revise_word.length === 0){
+        let new_words = will_study_new_word;
+        for (let i = 0; i < new_words.length; i++) {
+          new_words[i].new_word = true
+        }
+        this.setData({
+          all_words: new_words
+        })
+      }else{
+        let new_words = will_study_new_word;
+        for (let i = 0; i < new_words.length; i++) {
+          new_words[i].new_word = true
+        }
+        let revise_words = will_study_revise_word;
+        for (let i = 0; i < revise_words.length; i++) {
+          revise_words[i].new_word = false
+        }
+        this.setData({
+          all_words: new_words.concat(revise_words),
+        })
+      }
+      wx.setStorageSync('allwords', this.data.all_words)
       wx.hideLoading()
       wx.navigateTo({
         url: '../word_detail/word_detail?from=index&english_id='+english_id+'&rank='+res.data.rank+'&list_number='+res.data.list_number,
