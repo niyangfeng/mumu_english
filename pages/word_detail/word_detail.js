@@ -403,9 +403,6 @@ Page({
             return;
           } 
         } 
-        
-        
-
       }
     }
   },
@@ -463,17 +460,21 @@ Page({
     for (let k = 0; k < storage_word.length; k++) {
       if (storage_word[k].is_new_words === 1) {
         new_word_num++
-        this.setData({
-          now_new_word_num: new_word_num
-        })
+        // this.setData({
+        //   now_new_word_num: new_word_num
+        // })
       } else if (storage_word[k].is_new_words === 0) {
         revise_word_num++
-        this.setData({
-          now_revise_word_num: revise_word_num
-        })
+        // this.setData({
+        //   now_revise_word_num: revise_word_num
+        // })
       }
       
     }
+    this.setData({
+      now_new_word_num: new_word_num,
+      now_revise_word_num: revise_word_num
+    })
     this.setData({
       progress_new: Math.round(new_word_num / this.data.new_words_number * 10000) / 100.00 + "%",
       progress_revise: Math.round(revise_word_num / this.data.revise_words_number * 10000) / 100.00 + "%",
