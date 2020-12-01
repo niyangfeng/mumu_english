@@ -13,17 +13,14 @@ Page({
   handleSearch:function(e){
     let that = this;
     HTTP.searchWords({ word: that.data.search_key_word,token:wx.getStorageSync('token') }).then((res) => {
-      if(res.data.data.length == 0){
-        that.setData({
-          search_list: res.data.data
-        })
+      console.log(res)
+      if(res.data.status == 0){
+        wx.navigateTo({
+          url: '../word_detail/word_detail?from=search&english_id='+res.data.data.words.id,
+        })  
       }else{
-        let new_word = {
-          word: res.data.words.english,
-          id: res.data.words.id
-        }
         that.setData({
-          search_list: [new_word]
+          search_list: []
         })
       }
       

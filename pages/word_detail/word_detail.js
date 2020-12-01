@@ -272,6 +272,7 @@ Page({
         })
         this.playAudio(this.data.new_word_study_list[i + 1].english)
         this.loadDetail(this.data.new_word_study_list[i + 1].english_id)
+        this.echartInit();
         return 
       }
     }
@@ -294,6 +295,7 @@ Page({
         })
         this.playAudio(this.data.new_word_study_list[i - 1].english)
         this.loadDetail(this.data.new_word_study_list[i - 1].english_id)
+        this.echartInit();
         return
       }
     }
@@ -335,7 +337,12 @@ Page({
           this.echartInit();
           this.handleProgress()
           return;
-        } 
+        } else if (i >= (word_arr.length)){
+          this.setData({ english_id: word_arr[0].words.id });      
+          this.echartInit();
+          this.handleProgress()
+          return;
+        }
         
       }
     }
